@@ -30,18 +30,19 @@ public class Main {
         try {
             website = Jsoup.connect(downloadURL).maxBodySize(0).get();
             Elements webTable = website.select("div.mw-parser-output table").get(2).select("tr");
+            List<String> lineNumbers = parseLineNumbers(webTable);
 
             /*создание дерева с номером линии : списком станций на этой линии*/
             TreeMap<String, List<String>> blockStationForJsonFile = new TreeMap<>();
-            for (int i = 0; i < parseLineNumbers(webTable).size(); i++) {
-                String currentLineNumber = parseLineNumbers(webTable).get(i);
+            for (int i = 0; i < lineNumbers.size(); i++) {
+                String currentLineNumber = lineNumbers.get(i);
                 blockStationForJsonFile.put(currentLineNumber, parseStationNamesByLine(webTable, currentLineNumber));
             }
 
             /*создание списка объектов Line (номер и название линии)*/
             List<Line> blockLinesForJsonFile = new ArrayList<>();
-            for (int i = 0; i < parseLineNumbers(webTable).size(); i++) {
-                blockLinesForJsonFile.add(new Line(parseLineNumbers(webTable).get(i), parseLineNames(webTable).get(i)));
+            for (int i = 0; i < lineNumbers.size(); i++) {
+                blockLinesForJsonFile.add(new Line(lineNumbers.get(i), parseLineNames(webTable).get(i)));
             }
 
             /*Запись в json файл, выше созданных блоков и соединений*/
